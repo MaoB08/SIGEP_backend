@@ -26,7 +26,7 @@ public class ContactInfoService {
         contactInfo.setOperator(operator);
 
         contactInfo = contactInfoRepository.save(contactInfo);
-        contactInfo.setContactCode(operator.getOperator_id() + "ph" + contactInfo.getContact_id() + 1);
+        contactInfo.setContactCode(operator.getOperator_id() + "ph" + (long) operator.getContactInfo().size());
         contactInfo = contactInfoRepository.save(contactInfo);
 
         return new ContactInfoDTO(
@@ -41,7 +41,7 @@ public class ContactInfoService {
 
         contactInfo.setPhone(contactInfoDTO.phone());
         contactInfo.setPhoneCompany(contactInfoDTO.phoneCompany());
-        contactInfo.setContactCode(contactInfo.getOperator().getOperator_id() + "ph" + contactInfo.getContact_id());
+        contactInfo.setContactCode(contactInfo.getContactCode());
 
         contactInfo = contactInfoRepository.save(contactInfo);
 
