@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -23,5 +24,8 @@ public class Operator {
     private boolean status;
 
     @OneToMany(mappedBy = "operator", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ContactInfo> contactInfo;
+    private List<ContactInfo> contactInfo = new ArrayList<>();
+
+    @OneToMany(mappedBy = "operator",cascade = CascadeType.ALL)
+    private List<TollStation> tollStations = new ArrayList<>();
 }
