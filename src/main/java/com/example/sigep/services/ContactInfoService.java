@@ -1,6 +1,7 @@
 package com.example.sigep.services;
 
 import com.example.sigep.dtos.ContactInfoDTO;
+import com.example.sigep.mappers.ContactInfoMapper;
 import com.example.sigep.models.ContactInfo;
 import com.example.sigep.models.Operator;
 import com.example.sigep.repositories.ContactInfoRepository;
@@ -10,6 +11,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ContactInfoService {
+
+    private final ContactInfoMapper contactInfoMapper;
+
+    public ContactInfoService(ContactInfoMapper contactInfoMapper) {
+        this.contactInfoMapper = contactInfoMapper;
+    }
 
     @Autowired
     private ContactInfoRepository contactInfoRepository;
@@ -29,11 +36,7 @@ public class ContactInfoService {
         contactInfo.setContactCode(operator.getOperator_id() + "ph" + (long) operator.getContactInfo().size());
         contactInfo = contactInfoRepository.save(contactInfo);
 
-        return new ContactInfoDTO(
-                contactInfo.getPhone(),
-                contactInfo.getPhoneCompany(),
-                contactInfo.getContactCode()
-        );
+        return contactInfoMapper.toContactInfoDTO(contactInfo);
     }
 
     public ContactInfoDTO editContact(String contactCode, ContactInfoDTO contactInfoDTO) {
@@ -45,10 +48,6 @@ public class ContactInfoService {
 
         contactInfo = contactInfoRepository.save(contactInfo);
 
-        return new ContactInfoDTO(
-                contactInfo.getPhone(),
-                contactInfo.getPhoneCompany(),
-                contactInfo.getContactCode()
-        );
+        return contactInfoMapper.toContactInfoDTO(contactInfo);
     }
 }

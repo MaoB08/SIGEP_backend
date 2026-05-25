@@ -4,6 +4,7 @@ import com.example.sigep.dtos.ContactInfoDTO;
 import com.example.sigep.dtos.OperatorDTO;
 import com.example.sigep.dtos.OperatorDTORequest;
 import com.example.sigep.dtos.OperatorFullDTO;
+import com.example.sigep.mappers.OperatorMapper;
 import com.example.sigep.models.ContactInfo;
 import com.example.sigep.models.Operator;
 import com.example.sigep.repositories.ContactInfoRepository;
@@ -17,6 +18,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 public class OperatorService {
 
+    private final OperatorMapper operatorMapper;
+
+    public OperatorService(OperatorMapper operatorMapper) {
+        this.operatorMapper = operatorMapper;
+    }
+
     @Autowired
     OperatorRepository operatorRepository;
 
@@ -28,19 +35,8 @@ public class OperatorService {
         return operatorRepository.findAll().stream().map(operator  -> new OperatorDTO(operator.getName(),operator.getAge(),operator.isStatus())).toList();
     }
     public List<OperatorFullDTO> getAllOperatorsWithContactInfo(){
-        return operatorRepository.findAll().stream().map(operator ->
-                new OperatorFullDTO(
-                        operator.getName(),
-                        operator.getAge(),
-                        operator.isStatus(),
-                        operator.getContactInfo()
-                                .stream()
-                                .map(
-                                contactInfo -> new ContactInfoDTO(
-                                        contactInfo.getPhone(),
-                                        contactInfo.getPhoneCompany(),
-                                        contactInfo.getContactCode())).toList()
-                )).toList();
+        List<Operator> operators =operatorRepository.findAll();
+        return operatorMapper.listOfFullOperator(operators);
     }
     public List<OperatorDTO> getOperatorById(Long id){
         return operatorRepository.findById(id).stream().map(operator -> new OperatorDTO(operator.getName(),operator.getAge(),operator.isStatus())).toList();
@@ -93,7 +89,7 @@ public class OperatorService {
         op.setAge(operatorDTO.age());
         op.setStatus(operatorDTO.state());
         operatorRepository.save(op);
-        return new OperatorFullDTO(op.getName(), op.getAge(), op.isStatus(), op.getContactInfo().stream().map(contactInfo -> new ContactInfoDTO(contactInfo.getPhone(), contactInfo.getPhoneCompany(), contactInfo.getContactCode())).toList());
+        return operatorMapper.OpertorToOperatorFullDTO(op);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.example.sigep.services;
 
 import com.example.sigep.dtos.*;
+import com.example.sigep.mappers.TollStationMapper;
 import com.example.sigep.models.Operator;
 import com.example.sigep.models.State;
 import com.example.sigep.models.TollStation;
@@ -17,9 +18,11 @@ import java.util.List;
 public class TollStationService {
 
     private final TollStationRepository tollStationRepository;
+    private final TollStationMapper tollStationMapper;
 
-    public TollStationService(TollStationRepository tollStationRepository) {
+    public TollStationService(TollStationRepository tollStationRepository, TollStationMapper tollStationMapper) {
         this.tollStationRepository = tollStationRepository;
+        this.tollStationMapper = tollStationMapper;
     }
 
     @Autowired
@@ -29,49 +32,18 @@ public class TollStationService {
     StateRepository stateRepository;
 
     public List<TollStationDTO> getOnlyTollStations() {
-        return tollStationRepository.findAll().stream().map(toll ->
-                new TollStationDTO(
-                        toll.getName(),
-                        toll.getCode(),
-                        toll.getNumberOfEmployees(),
-                        toll.getStatus()
-                )).toList();
+        List<TollStation> tollStations = tollStationRepository.findAll();
+        return tollStationMapper.listOfTollStationDTO(tollStations);
     }
 
     public List<TollStationFullDTO> getAllTollStations() {
-        return tollStationRepository.findAll().stream().map(toll ->
-                new TollStationFullDTO(
-                        toll.getName(),
-                        toll.getCode(),
-                        toll.getNumberOfEmployees(),
-                        toll.getStatus(),
-                        new OperatorDTO(
-                                toll.getOperator().getName(),
-                                toll.getOperator().getAge(),
-                                toll.getOperator().isStatus()
-                        ),
-                        new StateDTO(
-                                toll.getState().getStateName()
-                        )
-                )).toList();
+        List<TollStation> tollStations = tollStationRepository.findAll();
+        return tollStationMapper.listOfTollStationFullDTO(tollStations);
     }
 
     public TollStationFullDTO getSpecificTollStation(Long id) {
         TollStation toll = tollStationRepository.findById(id).orElseThrow(()->new RuntimeException("Estacion de peaje no encontrada"));
-        return new TollStationFullDTO(
-                toll.getName(),
-                toll.getCode(),
-                toll.getNumberOfEmployees(),
-                toll.getStatus(),
-                new OperatorDTO(
-                        toll.getOperator().getName(),
-                        toll.getOperator().getAge(),
-                        toll.getOperator().isStatus()
-                ),
-                new StateDTO(
-                        toll.getState().getStateName()
-                )
-        );
+        return tollStationMapper.toFullDTO(toll);
     }
 
     public TollStationFullDTO createTollStation(TollStationRequestDTO tollStationFullDTO) {
@@ -88,20 +60,7 @@ public class TollStationService {
         tollStation.setState(state);
         tollStationRepository.save(tollStation);
 
-        return new TollStationFullDTO(
-                tollStation.getName(),
-                tollStation.getCode(),
-                tollStation.getNumberOfEmployees(),
-                tollStation.getStatus(),
-                new OperatorDTO(
-                        tollStation.getOperator().getName(),
-                        tollStation.getOperator().getAge(),
-                        tollStation.getOperator().isStatus()
-                ),
-                new StateDTO(
-                        tollStation.getState().getStateName()
-                )
-        );
+        return tollStationMapper.toFullDTO(tollStation);
     }
 
     public TollStationFullDTO editTollStation(Long id, TollStationRequestDTO tollStationFullDTO) {
@@ -116,20 +75,7 @@ public class TollStationService {
         tollStation.setOperator(op);
         tollStation.setState(state);
         tollStationRepository.save(tollStation);
-        return new TollStationFullDTO(
-                tollStation.getName(),
-                tollStation.getCode(),
-                tollStation.getNumberOfEmployees(),
-                tollStation.getStatus(),
-                new OperatorDTO(
-                        tollStation.getOperator().getName(),
-                        tollStation.getOperator().getAge(),
-                        tollStation.getOperator().isStatus()
-                ),
-                new StateDTO(
-                        tollStation.getState().getStateName()
-                )
-        );
+        return tollStationMapper.toFullDTO(tollStation);
     }
 
     public ResponseEntity<String> deleteTollStation(Long id) {
